@@ -1,0 +1,170 @@
+<%- include('includes/header', { title: 'Perfumes' }) %>
+<%- include('includes/nav', { active: 'perfumes' }) %>
+
+<main class="page">
+  <div class="page-head">
+    <div>
+      <p class="eyebrow">Catalogue</p>
+      <h1 class="page-title">Perfumes</h1>
+      <p class="muted"><%= products.length %> <%= products.length === 1 ? 'perfume' : 'perfumes' %> in your shop</p>
+    </div>
+    <button class="btn btn-primary" id="new-perfume-btn" type="button">+ New perfume</button>
+  </div>
+
+  <!-- NEW PERFUME FORM -->
+  <form
+    id="perfume-form"
+    class="card perfume-form"
+    style="display: none"
+    onsubmit="return validateForm()"
+    action="/admin/product/create"
+    method="POST"
+    enctype="multipart/form-data"
+  >
+    <h2 class="card-title">New perfume</h2>
+    <input name="productStatus" value="PAUSE" class="product-status" hidden />
+
+    <div class="grid-2">
+      <div class="field">
+        <label for="productName">Perfume name *</label>
+        <input id="productName" type="text" name="productName" class="product-name" placeholder="e.g. Black Orchid" />
+      </div>
+      <div class="field">
+        <label for="productBrand">Brand *</label>
+        <input id="productBrand" type="text" name="productBrand" class="product-brand" placeholder="e.g. Tom Ford" />
+      </div>
+    </div>
+
+    <div class="grid-3">
+      <div class="field">
+        <label for="productCollection">Collection *</label>
+        <select id="productCollection" class="product-collection" name="productCollection">
+          <option value="WOMEN" selected>Women</option>
+          <option value="MEN">Men</option>
+          <option value="UNISEX">Unisex</option>
+          <option value="GIFT_SET">Gift set</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="productConcentration">Concentration</label>
+        <select id="productConcentration" class="product-concentration" name="productConcentration">
+          <option value="PARFUM">Parfum</option>
+          <option value="EAU_DE_PARFUM" selected>Eau de Parfum</option>
+          <option value="EAU_DE_TOILETTE">Eau de Toilette</option>
+          <option value="EAU_DE_COLOGNE">Eau de Cologne</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="productVolume">Bottle size (ml) *</label>
+        <input id="productVolume" type="number" min="1" name="productVolume" class="product-volume" value="50" />
+      </div>
+    </div>
+
+    <div class="grid-2">
+      <div class="field">
+        <label for="productPrice">Price *</label>
+        <input id="productPrice" type="number" min="0" step="any" name="productPrice" class="product-price" placeholder="Price" />
+      </div>
+      <div class="field">
+        <label for="productLeftCount">Stock (bottles left) *</label>
+        <input id="productLeftCount" type="number" min="0" name="productLeftCount" class="product-left-count" placeholder="Stock" />
+      </div>
+    </div>
+
+    <div class="field">
+      <label for="productDesc">Description</label>
+      <textarea id="productDesc" name="productDesc" class="product-desc" rows="4" placeholder="Top notes, heart notes, base notes, mood..."></textarea>
+    </div>
+
+    <div class="field">
+      <label>Images * <small>(first image is required, up to 5)</small></label>
+      <div class="upload-grid">
+        <% for (let i = 1; i <= 5; i++) { %>
+        <label class="upload-box">
+          <span class="upload-plus">+</span>
+          <img id="image-section-<%= i %>" alt="" hidden />
+          <input
+            type="file"
+            name="productImages"
+            accept="image/png, image/jpeg"
+            <%= i === 1 ? 'required' : '' %>
+            onchange="previewFileHandler(this, <%= i %>)"
+            hidden
+          />
+        </label>
+        <% } %>
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <button class="btn btn-ghost" id="cancel-btn" type="button">Cancel</button>
+      <button class="btn btn-primary" id="create-btn" type="submit">Create</button>
+    </div>
+  </form>
+
+  <!-- PERFUMES TABLE -->
+  <section class="card">
+    <% if (products.length === 0) { %>
+    <div class="empty">
+      <p class="empty-title">No perfumes yet</p>
+      <p class="muted">Click “New perfume” to add the first one.</p>
+    </div>
+    <% } else { %>
+    <div class="table-wrap">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Perfume</th>
+            <th>Collection</th>
+            <th>Concentration</th>
+            <th>Size</th>
+            <th>Price</th>
+            <th>Stock</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% products.forEach(function (value, key) { %>
+          <tr>
+            <td class="muted"><%= key + 1 %></td>
+            <td>
+              <div class="cell-media">
+                <% if (value.productImages && value.productImages.length) { %>
+                <img class="thumb" alt="" src="/<%= String(value.productImages[0]).replace(/\\/g, '/') %>" />
+                <% } else { %>
+                <span class="thumb-empty"><%= String(value.productName).charAt(0).toUpperCase() %></span>
+                <% } %>
+                <div>
+                  <div class="cell-title"><%= value.productName %></div>
+                  <div class="muted small"><%= value.productBrand %></div>
+                </div>
+              </div>
+            </td>
+            <td><%= String(value.productCollection).replace('_', ' ') %></td>
+            <td><%= String(value.productConcentration || '').replace(/_/g, ' ') %></td>
+            <td><%= value.productVolume %> ml</td>
+            <td><%= value.productPrice %></td>
+            <td><%= value.productLeftCount %></td>
+            <td>
+              <select
+                class="status-select product-status-select"
+                data-id="<%= value._id %>"
+                data-status="<%= value.productStatus %>"
+              >
+                <option value="PAUSE" <%= value.productStatus === 'PAUSE' ? 'selected' : '' %>>PAUSE</option>
+                <option value="PROCESS" <%= value.productStatus === 'PROCESS' ? 'selected' : '' %>>PROCESS</option>
+                <option value="DELETE" <%= value.productStatus === 'DELETE' ? 'selected' : '' %>>DELETE</option>
+              </select>
+            </td>
+          </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
+    <% } %>
+  </section>
+</main>
+
+<script type="text/javascript" src="/js/products.js"></script>
+<%- include('includes/footer') %>

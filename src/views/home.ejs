@@ -1,0 +1,29 @@
+<%- include('includes/header', { title: 'Home' }) %>
+<%- include('includes/nav', { active: 'home' }) %>
+
+<main class="hero">
+  <div class="hero-inner">
+    <svg class="hero-bottle" viewBox="0 0 120 160" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <rect x="46" y="6" width="28" height="24" rx="4" />
+      <rect x="53" y="30" width="14" height="14" rx="2" />
+      <rect x="20" y="44" width="80" height="106" rx="20" />
+      <rect x="38" y="86" width="44" height="38" rx="5" />
+      <path d="M60 98v14M53 105h14" />
+    </svg>
+
+    <p class="eyebrow">Admin panel</p>
+    <h1 class="hero-title">Perfume Shop</h1>
+
+    <% if (!member) { %>
+    <p class="lead">Sign in to manage your perfumes and customers.</p>
+    <div class="hero-actions">
+      <a class="btn btn-primary" href="/admin/login">Login</a>
+      <a class="btn btn-ghost" href="/admin/signup">Signup</a>
+    </div>
+    <% } else { %>
+    <p class="lead">Welcome back, <%= member.memberNick %>.</p>
+    <% } %>
+  </div>
+</main>
+
+<%- include('includes/footer') %>

@@ -1,0 +1,223 @@
+import { Model } from "mongoose";
+import MemberModel from "../schema/Member.model";
+import { Member, MemberInput, MemberUpdateInput } from "../libs/types/member";
+import Errors, { HttpCode, Message } from "../libs/Errors";
+import { MemberStatus, MemberType } from "../libs/enums/member.enum";
+import { LoginInput } from "../libs/types/member";
+import { shapeIntoMongooseObjectId } from "../libs/config";
+
+// bcryptjs does not provide declarations in this project; keep the import typed locally.
+const bcrypt: {
+  genSalt(): Promise<string>;
+  hash(value: string, salt: string): Promise<string>;
+  compare(value: string, hash: string): Promise<boolean>;
+} = require("bcryptjs");
+
+class MemberService {
+  private readonly memberModel: Model<any>;
+
+  constructor() {
+    this.memberModel = MemberModel;
+  }
+
+  /********************* SPA *********************/
+  /////////////////////////////////////////////////
+
+  /******************** getShop ************************/
+
+  public async getShop(): Promise<Member> {
+    const result = await this.memberModel
+      .findOne({ memberType: MemberType.SHOP_OWNER })
+      .lean()
+      .exec();
+    if (!result) throw new Errors(HttpCode.NOT_FOUND, Message.NO_DATA_FOUND);
+
+    return result;
+  }
+
+  /******************** signup ************************/
+
+  public async signup(input: MemberInput): Promise<Member> {
+    const salt = await bcrypt.genSalt();
+    input.memberPassword = await bcrypt.hash(input.memberPassword, salt);
+
+    try {
+      const result = await this.memberModel.create(input);
+      result.memberPassword = "";
+      return result.toJSON();
+    } catch (err) {
+      console.error("Error, model:signup", err);
+      throw new Errors(HttpCode.BAD_REQUEST, Message.USED_NICK_PHONE);
+    }
+  }
+
+  /******************** login ************************/
+
+  public async login(input: LoginInput): Promise<Member> {
+    const member = await this.memberModel
+      .findOne(
+        {
+          memberNick: input.memberNick,
+          memberStatus: { $ne: MemberStatus.DELETE },
+        },
+        { memberNick: 1, memberPassword: 1, memberStatus: 1 },
+      )
+      .exec();
+    if (!member) throw new Errors(HttpCode.NOT_FOUND, Message.NO_MEMBER_NICK);
+    else if (member.memberStatus === MemberStatus.BLOCK) {
+      throw new Errors(HttpCode.FORBIDDEN, Message.BLOCKED_USER);
+    }
+
+    const isMatch = await bcrypt.compare(
+      input.memberPassword,
+      member.memberPassword,
+    );
+
+    if (!isMatch) {
+      throw new Errors(HttpCode.UNAUTHORIZED, Message.WRONG_PASSWORD);
+    }
+
+    return await this.memberModel.findById(member._id).lean().exec();
+  }
+
+  /******************** updateMember ************************/
+
+  public async updateMember(
+    member: Member,
+    input: MemberUpdateInput,
+  ): Promise<Member> {
+    const memberId = shapeIntoMongooseObjectId(member._id);
+    const result = await this.memberModel
+      .findByIdAndUpdate({ _id: memberId }, input, { new: true })
+      .exec();
+    if (!result) throw new Errors(HttpCode.NOT_MODIFIED, Message.UPDATE_FAILED);
+    return result;
+  }
+
+  /******************** getTopUsers ************************/
+
+  public async getTopUsers(): Promise<Member[]> {
+    const result = await this.memberModel
+      .find({
+        memberStatus: MemberStatus.ACTIVE,
+        memberPoints: { $gte: 1 },
+      })
+      .sort({ memberPoints: -1 })
+      .limit(4)
+      .exec();
+    return result;
+  }
+
+  public async addUserPoint(member: Member, point: number): Promise<Member> {
+    const memberId = shapeIntoMongooseObjectId(member._id);
+
+    return await this.memberModel
+      .findOneAndUpdate(
+        {
+          _id: memberId,
+          memberType: MemberType.USER,
+          memberStatus: MemberStatus.ACTIVE,
+        },
+        { $inc: { memberPoints: point } },
+        { new: true },
+      )
+      .exec();
+  }
+
+  /********************** SSR ********************/
+  /////////////////////////////////////////////////
+
+  public async getMemberDetail(member: Member): Promise<Member> {
+    const memberId = shapeIntoMongooseObjectId(member._id);
+    const result = await this.memberModel
+      .findOne({ _id: memberId, memberStatus: MemberStatus.ACTIVE })
+      .exec();
+    if (!result) throw new Errors(HttpCode.NOT_FOUND, Message.NO_DATA_FOUND);
+
+    return result;
+  }
+
+  /******************** processSignup ************************/
+
+  public async processSignup(input: MemberInput): Promise<Member> {
+    // the admin panel belongs to one shop owner only
+    const exist = await this.memberModel
+      .findOne({ memberType: MemberType.SHOP_OWNER })
+      .exec();
+    if (exist)
+      throw new Errors(HttpCode.BAD_REQUEST, Message.SHOP_ALREADY_EXISTS);
+
+    const salt = await bcrypt.genSalt();
+    input.memberPassword = await bcrypt.hash(input.memberPassword, salt);
+
+    try {
+      const result = await this.memberModel.create(input);
+      result.memberPassword = "";
+      return result;
+    } catch (err) {
+      console.error("Error, model:processSignup", err);
+      throw new Errors(HttpCode.BAD_REQUEST, Message.USED_NICK_PHONE);
+    }
+  }
+
+  /******************** processLogin ************************/
+
+  public async processLogin(input: LoginInput): Promise<Member> {
+    // only the shop owner can enter the admin panel
+    const member = await this.memberModel
+      .findOne(
+        { memberNick: input.memberNick, memberType: MemberType.SHOP_OWNER },
+        { memberNick: 1, memberPassword: 1 },
+      )
+      .exec();
+    if (!member) throw new Errors(HttpCode.NOT_FOUND, Message.NO_MEMBER_NICK);
+
+    const isMatch = await bcrypt.compare(
+      input.memberPassword,
+      member.memberPassword,
+    );
+
+    if (!isMatch) {
+      throw new Errors(HttpCode.UNAUTHORIZED, Message.WRONG_PASSWORD);
+    }
+
+    return await this.memberModel.findById(member._id).exec();
+  }
+
+  /******************** getUsers ************************/
+
+  public async getUsers(): Promise<Member[]> {
+    const result = await this.memberModel
+      .find({ memberType: MemberType.USER })
+      .sort({ createdAt: -1 })
+      .exec();
+
+    if (!result) throw new Errors(HttpCode.NOT_FOUND, Message.NO_DATA_FOUND);
+
+    return result;
+  }
+
+  /******************** updateChosenUser ************************/
+
+  // the admin can only change a user's status (ACTIVE / BLOCK / DELETE)
+  public async updateChosenUser(input: MemberUpdateInput): Promise<Member> {
+    const memberId = shapeIntoMongooseObjectId(input._id);
+
+    if (!Object.values(MemberStatus).includes(input.memberStatus as MemberStatus))
+      throw new Errors(HttpCode.BAD_REQUEST, Message.UPDATE_FAILED);
+
+    const result = await this.memberModel
+      .findOneAndUpdate(
+        { _id: memberId, memberType: MemberType.USER },
+        { memberStatus: input.memberStatus },
+        { new: true },
+      )
+      .exec();
+
+    if (!result) throw new Errors(HttpCode.NOT_MODIFIED, Message.UPDATE_FAILED);
+
+    return result;
+  }
+}
+
+export default MemberService;

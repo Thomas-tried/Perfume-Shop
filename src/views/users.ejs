@@ -1,0 +1,70 @@
+<%- include('includes/header', { title: 'Users' }) %>
+<%- include('includes/nav', { active: 'users' }) %>
+
+<main class="page">
+  <div class="page-head">
+    <div>
+      <p class="eyebrow">Customers</p>
+      <h1 class="page-title">Users</h1>
+      <p class="muted"><%= users.length %> <%= users.length === 1 ? 'user' : 'users' %> registered</p>
+    </div>
+  </div>
+
+  <section class="card">
+    <% if (users.length === 0) { %>
+    <div class="empty">
+      <p class="empty-title">No users yet</p>
+      <p class="muted">Customers who sign up in your shop will appear here.</p>
+    </div>
+    <% } else { %>
+    <div class="table-wrap">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Name</th>
+            <th>Phone</th>
+            <th>Points</th>
+            <th>Joined</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% users.forEach(function (value, index) { %>
+          <tr>
+            <td class="muted"><%= index + 1 %></td>
+            <td>
+              <div class="cell-media">
+                <% if (value.memberImage) { %>
+                <img class="thumb thumb-round" alt="" src="/<%= String(value.memberImage).replace(/\\/g, '/') %>" />
+                <% } else { %>
+                <span class="thumb-empty thumb-round"><%= String(value.memberNick).charAt(0).toUpperCase() %></span>
+                <% } %>
+                <div class="cell-title"><%= value.memberNick %></div>
+              </div>
+            </td>
+            <td><%= value.memberPhone %></td>
+            <td><%= value.memberPoints %></td>
+            <td class="muted"><%= new Date(value.createdAt).toLocaleDateString('en-GB') %></td>
+            <td>
+              <select
+                class="status-select member-status"
+                data-id="<%= value._id %>"
+                data-status="<%= value.memberStatus %>"
+              >
+                <option value="ACTIVE" <%= value.memberStatus === 'ACTIVE' ? 'selected' : '' %>>ACTIVE</option>
+                <option value="BLOCK" <%= value.memberStatus === 'BLOCK' ? 'selected' : '' %>>BLOCK</option>
+                <option value="DELETE" <%= value.memberStatus === 'DELETE' ? 'selected' : '' %>>DELETE</option>
+              </select>
+            </td>
+          </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
+    <% } %>
+  </section>
+</main>
+
+<script type="text/javascript" src="/js/users.js"></script>
+<%- include('includes/footer') %>

@@ -1,0 +1,20 @@
+<% const current = typeof active !== 'undefined' ? active : ''; %>
+<header class="site-nav">
+  <a class="brand" href="/admin">
+    <span class="brand-mark">Perfume Shop</span>
+    <span class="brand-sub">Admin</span>
+  </a>
+  <nav>
+    <ul class="nav-links">
+      <li><a href="/admin" class="<%= current === 'home' ? 'active' : '' %>">Home</a></li>
+      <% if (!member) { %>
+      <li><a href="/admin/signup" class="<%= current === 'signup' ? 'active' : '' %>">Signup</a></li>
+      <li><a href="/admin/login" class="<%= current === 'login' ? 'active' : '' %>">Login</a></li>
+      <% } else { %>
+      <li><a href="/admin/product/all" class="<%= current === 'perfumes' ? 'active' : '' %>">Perfumes</a></li>
+      <li><a href="/admin/user/all" class="<%= current === 'users' ? 'active' : '' %>">Users</a></li>
+      <li><a href="/admin/logout" class="logout-link">Logout</a></li>
+      <% } %>
+    </ul>
+  </nav>
+</header>

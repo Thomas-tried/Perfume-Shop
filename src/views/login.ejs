@@ -1,0 +1,28 @@
+<%- include('includes/header', { title: 'Login' }) %>
+<%- include('includes/nav', { active: 'login' }) %>
+
+<main class="auth-wrap">
+  <form class="card auth-card" action="/admin/login" method="POST">
+    <p class="eyebrow">Shop owner</p>
+    <h2 class="auth-title">Welcome back</h2>
+    <p class="muted">Sign in to manage your perfumes.</p>
+
+    <div class="field">
+      <label for="memberNick">Username</label>
+      <input id="memberNick" type="text" name="memberNick" class="member-nick" placeholder="Your shop username" required />
+    </div>
+
+    <div class="field">
+      <label for="memberPassword">Password</label>
+      <input id="memberPassword" type="password" name="memberPassword" class="member-password" placeholder="Password" required />
+    </div>
+
+    <button class="btn btn-primary btn-block" name="login" type="submit">Login</button>
+
+    <p class="auth-foot">
+      Not registered yet? <a href="/admin/signup">Signup</a>
+    </p>
+  </form>
+</main>
+
+<%- include('includes/footer') %>
