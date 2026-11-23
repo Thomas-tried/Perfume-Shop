@@ -23,6 +23,7 @@ export enum Message {
   BLOCKED_USER = "You have been blocked, contact admin!",
   WRONG_PASSWORD = "Wrong password, please try again!",
   NOT_AUTHENTICATED = "You are not authenticated, please login first!",
+  MEMBER_IMAGE_REQUIRED = "Please upload your profile image!",
 }
 
 class Errors extends Error {

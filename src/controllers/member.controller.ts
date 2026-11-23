@@ -34,12 +34,17 @@ memberController.getShop = async (req: Request, res: Response) => {
 
 /******************** signup ************************/
 
-memberController.signup = async (req: Request, res: Response) => {
+memberController.signup = async (req: ExtendedRequest, res: Response) => {
   try {
     console.log("signup");
 
-    const input: MemberInput = req.body,
-      result: Member = await memberService.signup(input),
+    if (!req.file)
+      throw new Errors(HttpCode.BAD_REQUEST, Message.MEMBER_IMAGE_REQUIRED);
+
+    const input: MemberInput = req.body;
+    input.memberImage = req.file.path.replace(/\\/g, "/");
+
+    const result: Member = await memberService.signup(input),
       token = await authService.createToken(result);
 
     res.cookie("accessToken", token, {

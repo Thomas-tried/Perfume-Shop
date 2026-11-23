@@ -62,7 +62,7 @@
 
     <div class="grid-2">
       <div class="field">
-        <label for="productPrice">Price *</label>
+        <label for="productPrice">Price ($) *</label>
         <input id="productPrice" type="number" min="0" step="any" name="productPrice" class="product-price" placeholder="Price" />
       </div>
       <div class="field">
@@ -144,7 +144,7 @@
             <td><%= String(value.productCollection).replace('_', ' ') %></td>
             <td><%= String(value.productConcentration || '').replace(/_/g, ' ') %></td>
             <td><%= value.productVolume %> ml</td>
-            <td><%= value.productPrice %></td>
+            <td><%= value.productPrice %> $</td>
             <td><%= value.productLeftCount %></td>
             <td>
               <select

@@ -150,7 +150,9 @@ h3 {
   color: var(--ink);
   font-size: 15px;
   font-weight: 500;
-  transition: background 0.2s, color 0.2s;
+  transition:
+    background 0.2s,
+    color 0.2s;
 }
 
 .nav-links a:hover {
@@ -186,7 +188,11 @@ h3 {
   font-weight: 500;
   letter-spacing: 0.04em;
   cursor: pointer;
-  transition: background 0.2s, color 0.2s, border-color 0.2s, transform 0.1s;
+  transition:
+    background 0.2s,
+    color 0.2s,
+    border-color 0.2s,
+    transform 0.1s;
 }
 
 .btn:hover {
@@ -258,6 +264,9 @@ h3 {
 /* ---------- Home ---------- */
 
 .hero {
+  position: relative;
+  overflow: hidden;
+  min-height: calc(100vh - 66px);
   min-height: calc(100vh - 66px);
   display: flex;
   align-items: center;
@@ -266,18 +275,26 @@ h3 {
   text-align: center;
   background:
     radial-gradient(circle at 50% 38%, #fff 0%, rgba(255, 255, 255, 0) 55%),
-    radial-gradient(circle at 85% 90%, var(--gold-soft) 0%, rgba(243, 234, 217, 0) 45%);
+    radial-gradient(
+      circle at 85% 90%,
+      var(--gold-soft) 0%,
+      rgba(243, 234, 217, 0) 45%
+    );
 }
 
 .hero-inner {
+  position: relative;
+  z-index: 1;
   max-width: 560px;
 }
 
 .hero-bottle {
-  width: 96px;
-  height: 128px;
+  width: 176px;
+  height: 136px;
+  overflow: visible;
   color: var(--gold);
-  margin-bottom: 28px;
+  margin-bottom: 24px;
+  animation: bottle-float 6s ease-in-out infinite;
 }
 
 .hero-title {
@@ -310,7 +327,11 @@ h3 {
   align-items: center;
   justify-content: center;
   padding: 40px 20px;
-  background: radial-gradient(circle at 50% 0%, var(--gold-soft) 0%, rgba(243, 234, 217, 0) 60%);
+  background: radial-gradient(
+    circle at 50% 0%,
+    var(--gold-soft) 0%,
+    rgba(243, 234, 217, 0) 60%
+  );
 }
 
 .auth-card {
@@ -373,7 +394,9 @@ textarea {
   font-family: var(--sans);
   font-size: 15px;
   color: var(--ink);
-  transition: border-color 0.2s, box-shadow 0.2s;
+  transition:
+    border-color 0.2s,
+    box-shadow 0.2s;
 }
 
 input:focus,
@@ -434,7 +457,9 @@ textarea {
   color: var(--gold);
   cursor: pointer;
   overflow: hidden;
-  transition: border-color 0.2s, background 0.2s;
+  transition:
+    border-color 0.2s,
+    background 0.2s;
 }
 
 .upload-box:hover {
@@ -474,7 +499,9 @@ textarea {
   border: 1.5px dashed var(--line);
   border-radius: 12px;
   cursor: pointer;
-  transition: border-color 0.2s, background 0.2s;
+  transition:
+    border-color 0.2s,
+    background 0.2s;
 }
 
 .avatar-upload:hover {
@@ -644,7 +671,9 @@ textarea {
   justify-content: center;
   gap: 18px;
   background: var(--ivory);
-  transition: opacity 0.5s ease, visibility 0.5s ease;
+  transition:
+    opacity 0.5s ease,
+    visibility 0.5s ease;
 }
 
 .pl-ring {
@@ -715,5 +744,149 @@ textarea {
 
   .perfume-form {
     padding: 22px;
+  }
+}
+
+/* ==========================================================
+   Home page animation: spraying perfume bottle + floating scent
+   ========================================================== */
+
+@keyframes bottle-float {
+  0%,
+  100% {
+    transform: translateY(0) rotate(-1.5deg);
+  }
+  50% {
+    transform: translateY(-10px) rotate(1.5deg);
+  }
+}
+
+.hero-cap {
+  transform-box: fill-box;
+  animation: cap-press 4.5s ease-in-out infinite;
+}
+
+@keyframes cap-press {
+  0%,
+  56%,
+  100% {
+    transform: translateY(0);
+  }
+  62% {
+    transform: translateY(3px);
+  }
+  68% {
+    transform: translateY(0);
+  }
+}
+
+.mist circle {
+  opacity: 0;
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: spray 4.5s ease-out infinite;
+  animation-delay: calc(2.5s + var(--delay));
+}
+
+@keyframes spray {
+  0% {
+    opacity: 0;
+    transform: translate(0, 0) scale(0.4);
+  }
+  6% {
+    opacity: 0.9;
+  }
+  30% {
+    opacity: 0;
+    transform: translate(var(--dx), var(--dy)) scale(1.7);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(var(--dx), var(--dy)) scale(1.7);
+  }
+}
+
+.liquid {
+  opacity: 0.16;
+  animation: liquid-glow 3.6s ease-in-out infinite;
+}
+
+@keyframes liquid-glow {
+  0%,
+  100% {
+    opacity: 0.12;
+  }
+  50% {
+    opacity: 0.3;
+  }
+}
+
+.scent-field {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.scent-field span {
+  position: absolute;
+  bottom: -20px;
+  left: var(--x);
+  width: var(--size);
+  height: var(--size);
+  border-radius: 50% 50% 50% 0;
+  background: var(--gold);
+  opacity: 0;
+  transform: rotate(-45deg);
+  animation: scent-rise var(--dur) ease-in infinite;
+  animation-delay: var(--delay);
+}
+
+@keyframes scent-rise {
+  0% {
+    opacity: 0;
+    transform: translate(0, 0) rotate(-45deg) scale(0.6);
+  }
+  12% {
+    opacity: 0.45;
+  }
+  70% {
+    opacity: 0.25;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(var(--drift), -105vh) rotate(-45deg) scale(1.2);
+  }
+}
+
+.rise {
+  opacity: 0;
+  animation: rise-in 0.9s ease-out forwards;
+  animation-delay: calc(var(--i) * 0.18s + 0.1s);
+}
+
+@keyframes rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-bottle,
+  .hero-cap,
+  .mist circle,
+  .liquid,
+  .scent-field span {
+    animation: none;
+  }
+
+  .rise {
+    animation: none;
+    opacity: 1;
   }
 }
