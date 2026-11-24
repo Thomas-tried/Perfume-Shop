@@ -22,6 +22,49 @@
   --sans: "Jost", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   --radius: 14px;
   --shadow: 0 1px 2px rgba(31, 27, 22, 0.04), 0 8px 30px rgba(31, 27, 22, 0.06);
+
+  /* extra theme variables (these change in dark mode) */
+  --btn-bg: #16130f;
+  --btn-fg: #ffffff;
+  --btn-hover: var(--gold-dark);
+  --nav-bg: rgba(250, 247, 242, 0.92);
+  --field-bg: #ffffff;
+  --row-hover: #fdfaf4;
+  --hero-glow: #ffffff;
+  --ok-line: #bfe0d0;
+  --warn-line: #efd9a8;
+  --bad-line: #efc4be;
+  color-scheme: light;
+}
+
+/* ---------- Night mode ---------- */
+[data-theme="dark"] {
+  --ivory: #14110d;
+  --paper: #1d1913;
+  --ink: #f1ebe0;
+  --muted: #a39a8b;
+  --line: #332c22;
+  --gold: #c9a56a;
+  --gold-dark: #d8b97f;
+  --gold-soft: #2a2318;
+  --ok: #5cc79b;
+  --ok-soft: #14291f;
+  --ok-line: #24503c;
+  --warn: #e3b45a;
+  --warn-soft: #2e2411;
+  --warn-line: #5a4519;
+  --bad: #ee7a6f;
+  --bad-soft: #331a17;
+  --bad-line: #5e2d28;
+  --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 10px 34px rgba(0, 0, 0, 0.35);
+  --btn-bg: #c9a56a;
+  --btn-fg: #14110d;
+  --btn-hover: #dcbd85;
+  --nav-bg: rgba(20, 17, 13, 0.92);
+  --field-bg: #14110d;
+  --row-hover: #231e16;
+  --hero-glow: #26201a;
+  color-scheme: dark;
 }
 
 * {
@@ -100,7 +143,7 @@ h3 {
   justify-content: space-between;
   gap: 24px;
   padding: 14px 32px;
-  background: rgba(250, 247, 242, 0.92);
+  background: var(--nav-bg);
   backdrop-filter: blur(10px);
   border-bottom: 1px solid var(--line);
 }
@@ -134,6 +177,12 @@ h3 {
   border-radius: 999px;
 }
 
+.site-nav nav {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
 .nav-links {
   display: flex;
   flex-wrap: wrap;
@@ -161,8 +210,8 @@ h3 {
 }
 
 .nav-links a.active {
-  background: var(--night);
-  color: #fff;
+  background: var(--btn-bg);
+  color: var(--btn-fg);
 }
 
 .nav-links a.logout-link {
@@ -204,12 +253,12 @@ h3 {
 }
 
 .btn-primary {
-  background: var(--night);
-  color: #fff;
+  background: var(--btn-bg);
+  color: var(--btn-fg);
 }
 
 .btn-primary:hover {
-  background: var(--gold-dark);
+  background: var(--btn-hover);
 }
 
 .btn-ghost {
@@ -221,6 +270,15 @@ h3 {
 .btn-ghost:hover {
   border-color: var(--gold);
   background: var(--gold-soft);
+}
+
+.btn-danger {
+  background: var(--bad);
+  color: #fff;
+}
+
+.btn-danger:hover {
+  background: #96352c;
 }
 
 .btn-block {
@@ -267,19 +325,14 @@ h3 {
   position: relative;
   overflow: hidden;
   min-height: calc(100vh - 66px);
-  min-height: calc(100vh - 66px);
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 40px 24px;
   text-align: center;
   background:
-    radial-gradient(circle at 50% 38%, #fff 0%, rgba(255, 255, 255, 0) 55%),
-    radial-gradient(
-      circle at 85% 90%,
-      var(--gold-soft) 0%,
-      rgba(243, 234, 217, 0) 45%
-    );
+    radial-gradient(circle at 50% 38%, var(--hero-glow) 0%, transparent 55%),
+    radial-gradient(circle at 85% 90%, var(--gold-soft) 0%, transparent 45%);
 }
 
 .hero-inner {
@@ -330,7 +383,7 @@ h3 {
   background: radial-gradient(
     circle at 50% 0%,
     var(--gold-soft) 0%,
-    rgba(243, 234, 217, 0) 60%
+    transparent 60%
   );
 }
 
@@ -388,7 +441,7 @@ select,
 textarea {
   width: 100%;
   padding: 12px 14px;
-  background: #fff;
+  background: var(--field-bg);
   border: 1px solid var(--line);
   border-radius: 10px;
   font-family: var(--sans);
@@ -581,7 +634,7 @@ textarea {
 }
 
 .data-table tbody tr:hover {
-  background: #fdfaf4;
+  background: var(--row-hover);
 }
 
 .cell-media {
@@ -631,20 +684,20 @@ textarea {
 .status-select[data-status="PROCESS"],
 .status-select[data-status="ACTIVE"] {
   background: var(--ok-soft);
-  border-color: #bfe0d0;
+  border-color: var(--ok-line);
   color: var(--ok);
 }
 
 .status-select[data-status="PAUSE"] {
   background: var(--warn-soft);
-  border-color: #efd9a8;
+  border-color: var(--warn-line);
   color: var(--warn);
 }
 
 .status-select[data-status="DELETE"],
 .status-select[data-status="BLOCK"] {
   background: var(--bad-soft);
-  border-color: #efc4be;
+  border-color: var(--bad-line);
   color: var(--bad);
 }
 
@@ -748,9 +801,141 @@ textarea {
 }
 
 /* ==========================================================
+   SweetAlert2 theme (popups + toasts)
+   ========================================================== */
+
+.swal2-container.swal2-backdrop-show,
+.swal2-container.swal2-noanimation {
+  background: rgba(22, 19, 15, 0.45) !important;
+}
+
+/* small corner notifications (toasts) have no dark backdrop */
+.swal2-container.swal2-top-end,
+body.swal2-toast-shown .swal2-container {
+  background: transparent !important;
+}
+
+/* keep toasts below the sticky navigation bar */
+.swal2-container.swal2-top-end {
+  padding-top: 78px;
+}
+
+.swal2-popup.swal-popup {
+  width: 30em;
+  max-width: 92vw;
+  padding: 36px 28px 28px;
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  box-shadow: 0 24px 70px rgba(22, 19, 15, 0.2);
+  font-family: var(--sans);
+  color: var(--ink);
+}
+
+.swal-popup .swal2-title {
+  margin: 10px 0 0;
+  padding: 0;
+  font-family: var(--serif);
+  font-size: 32px;
+  font-weight: 600;
+  line-height: 1.15;
+  color: var(--ink);
+}
+
+.swal-popup .swal2-html-container {
+  margin: 10px 0 0;
+  padding: 0 8px;
+  font-size: 16px;
+  line-height: 1.5;
+  color: var(--muted);
+}
+
+.swal-popup .swal2-actions {
+  gap: 10px;
+  margin-top: 26px;
+}
+
+.swal-popup .swal2-actions .btn {
+  min-width: 120px;
+}
+
+.swal-popup .swal2-actions .btn:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(176, 141, 87, 0.35);
+}
+
+.swal-popup .swal2-timer-progress-bar {
+  background: var(--gold);
+}
+
+/* icons use the site palette */
+
+.swal-popup .swal2-icon.swal2-error {
+  border-color: var(--bad);
+  color: var(--bad);
+}
+
+.swal-popup .swal2-icon.swal2-error [class^="swal2-x-mark-line"] {
+  background-color: var(--bad);
+}
+
+.swal-popup .swal2-icon.swal2-success {
+  border-color: var(--ok);
+  color: var(--ok);
+}
+
+.swal-popup .swal2-icon.swal2-success [class^="swal2-success-line"] {
+  background-color: var(--ok);
+}
+
+.swal-popup .swal2-icon.swal2-success [class^="swal2-success-circular-line"],
+.swal-popup .swal2-icon.swal2-success .swal2-success-fix {
+  background: var(--paper);
+}
+
+.swal-popup .swal2-icon.swal2-success .swal2-success-ring {
+  border-color: rgba(47, 125, 91, 0.25);
+}
+
+.swal-popup .swal2-icon.swal2-warning {
+  border-color: var(--warn);
+  color: var(--warn);
+}
+
+.swal-popup .swal2-icon.swal2-question,
+.swal-popup .swal2-icon.swal2-info {
+  border-color: var(--gold);
+  color: var(--gold-dark);
+}
+
+/* toasts (small notifications in the corner) */
+
+.swal2-popup.swal2-toast.swal-popup {
+  background: var(--paper);
+  color: var(--ink);
+  width: auto;
+  max-width: 92vw;
+  padding: 12px 18px;
+  border-radius: 14px;
+  box-shadow: var(--shadow);
+}
+
+.swal-popup.swal2-toast .swal2-title {
+  margin: 0 6px;
+  font-family: var(--sans);
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.swal-popup.swal2-toast .swal2-icon {
+  margin: 0 6px 0 0;
+}
+
+/* ==========================================================
    Home page animation: spraying perfume bottle + floating scent
    ========================================================== */
 
+/* the bottle drifts up and down and sways a little */
 @keyframes bottle-float {
   0%,
   100% {
@@ -761,6 +946,7 @@ textarea {
   }
 }
 
+/* the cap is pressed down, then comes back up */
 .hero-cap {
   transform-box: fill-box;
   animation: cap-press 4.5s ease-in-out infinite;
@@ -780,6 +966,7 @@ textarea {
   }
 }
 
+/* mist: a burst of droplets right after the press, then rest */
 .mist circle {
   opacity: 0;
   transform-box: fill-box;
@@ -806,6 +993,7 @@ textarea {
   }
 }
 
+/* the perfume inside softly shimmers */
 .liquid {
   opacity: 0.16;
   animation: liquid-glow 3.6s ease-in-out infinite;
@@ -821,6 +1009,7 @@ textarea {
   }
 }
 
+/* scent particles rising from the bottom of the page */
 .scent-field {
   position: absolute;
   inset: 0;
@@ -859,6 +1048,7 @@ textarea {
   }
 }
 
+/* text fades in one line after another */
 .rise {
   opacity: 0;
   animation: rise-in 0.9s ease-out forwards;
@@ -889,4 +1079,59 @@ textarea {
     animation: none;
     opacity: 1;
   }
+}
+
+/* ==========================================================
+   Day / night switch
+   ========================================================== */
+
+.theme-toggle {
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  margin-left: 6px;
+  padding: 0;
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  background: transparent;
+  color: var(--ink);
+  cursor: pointer;
+  transition:
+    background 0.2s,
+    border-color 0.2s,
+    transform 0.2s;
+}
+
+.theme-toggle:hover {
+  background: var(--gold-soft);
+  border-color: var(--gold);
+  transform: rotate(18deg);
+}
+
+.theme-toggle svg {
+  width: 19px;
+  height: 19px;
+}
+
+/* light mode shows the moon (switch to night), dark mode shows the sun (switch to day) */
+.theme-toggle .icon-sun {
+  display: none;
+}
+[data-theme="dark"] .theme-toggle .icon-sun {
+  display: block;
+}
+[data-theme="dark"] .theme-toggle .icon-moon {
+  display: none;
+}
+
+/* colours fade while the theme changes */
+html.theme-anim *,
+html.theme-anim *::before,
+html.theme-anim *::after {
+  transition:
+    background-color 0.35s ease,
+    color 0.35s ease,
+    border-color 0.35s ease,
+    box-shadow 0.35s ease !important;
 }

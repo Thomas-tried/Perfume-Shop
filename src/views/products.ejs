@@ -17,6 +17,7 @@
     class="card perfume-form"
     style="display: none"
     onsubmit="return validateForm()"
+    novalidate
     action="/admin/product/create"
     method="POST"
     enctype="multipart/form-data"
@@ -87,8 +88,7 @@
             type="file"
             name="productImages"
             accept="image/png, image/jpeg"
-            <%= i === 1 ? 'required' : '' %>
-            onchange="previewFileHandler(this, <%= i %>)"
+            onchange="previewFileHandler(this)"
             hidden
           />
         </label>

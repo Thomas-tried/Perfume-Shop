@@ -6,7 +6,6 @@ import { MemberStatus, MemberType } from "../libs/enums/member.enum";
 import { LoginInput } from "../libs/types/member";
 import { shapeIntoMongooseObjectId } from "../libs/config";
 
-// bcryptjs does not provide declarations in this project; keep the import typed locally.
 const bcrypt: {
   genSalt(): Promise<string>;
   hash(value: string, salt: string): Promise<string>;
@@ -203,7 +202,9 @@ class MemberService {
   public async updateChosenUser(input: MemberUpdateInput): Promise<Member> {
     const memberId = shapeIntoMongooseObjectId(input._id);
 
-    if (!Object.values(MemberStatus).includes(input.memberStatus as MemberStatus))
+    if (
+      !Object.values(MemberStatus).includes(input.memberStatus as MemberStatus)
+    )
       throw new Errors(HttpCode.BAD_REQUEST, Message.UPDATE_FAILED);
 
     const result = await this.memberModel

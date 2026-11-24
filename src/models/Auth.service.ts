@@ -1,8 +1,6 @@
 import Errors, { HttpCode, Message } from "../libs/Errors";
-import { resolve } from "node:dns";
 import { Member } from "../libs/types/member";
 import jwt from "jsonwebtoken";
-import { rejects } from "node:assert";
 import { AUTH_TIMER } from "../libs/config";
 class AuthService {
   private readonly secretToken;
